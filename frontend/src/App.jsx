@@ -831,6 +831,78 @@ function ChipTop3 (){
   )
 }
 
+function useVisibility(options) {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const observerCallback = (entries) => {
+      const entry = entries[0];
+      setIsVisible(entry.isIntersecting);
+    };
+
+    const observer = new IntersectionObserver(observerCallback, options);
+    if (ref.current) observer.observe(ref.current);
+
+    return () => {
+      if (ref.current) observer.unobserve(ref.current);
+    };
+  }, [options]);
+
+  return { ref, isVisible };
+}
+
+
+function AlertSparkline({data, width="100%", trendColors = { positive: 'teal.9', negative: 'orange.8', neutral: 'gray.6' } }){
+  //const { ref, isVisible } = useVisibility({
+  //  threshold: 0.5, // 50% do elemento precisa estar visível
+  //});
+  const [isVisibleAndValid, setIsVisibleAndValid] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver(() => {
+      if (ref.current) {
+        const { width, height } = ref.current.getBoundingClientRect();
+        // Atualiza o estado apenas quando o elemento é visível e tem tamanho válido
+        setIsVisibleAndValid((prev) => {
+          const isVisible = prev ? prev.isVisible : false;
+          return { isVisible, isValid: width > 0 && height > 0 };
+        });
+      }
+    });
+
+    const observerCallback = (entries) => {
+      const entry = entries[0];
+      setIsVisibleAndValid((prev) => ({
+        isVisible: entry.isIntersecting,
+        isValid: prev ? prev.isValid : false,
+      }));
+    };
+
+    const intersectionObserver = new IntersectionObserver(observerCallback, { threshold: 0.5 });
+
+    if (ref.current) {
+      resizeObserver.observe(ref.current);
+      intersectionObserver.observe(ref.current);
+    }
+
+    return () => {
+      if (ref.current) {
+        resizeObserver.unobserve(ref.current);
+        intersectionObserver.unobserve(ref.current);
+      }
+    };
+  }, []);
+  return(
+    <div ref={ref} style={{ width: '100%', height: '100%' }}>
+    {isVisibleAndValid.isVisible && isVisibleAndValid.isValid && (
+      <Sparkline w={width} h="100%" data={data} trendColors={trendColors} fillOpacity={0.5} />
+    )}
+    </div>
+  )
+}
+
 function AlertTable() {
   const data = [
     { stock: 'CBAV3', op: '>', value: 3.22, },
@@ -846,8 +918,10 @@ function AlertTable() {
     const data = [positiveTrend, negativeTrend, neutralTrend][Math.floor(Math.random() * 3)];
     return (
     <Table.Tr key={`rwAl${index}`}>
-      <Table.Td align="center" p={0}>
-        <Sparkline w={42} h={42} data={data} trendColors={{ positive: 'teal.9', negative: 'orange.8', neutral: 'gray.6' }} fillOpacity={0.5}/>
+      <Table.Td align="center" p={1}>
+      <Box style={{ width: '100%', maxWidth:'42px', height: '40px' }}>
+        <AlertSparkline data={data} trendColors={{ positive: 'teal.9', negative: 'orange.8', neutral: 'gray.6' }}/>
+      </Box>
       </Table.Td>
       <Table.Td align="center">{i.stock}</Table.Td>
       <Table.Td align="center" style={{ minWidth: '30px', maxWidth: '50px' }}>
@@ -1120,17 +1194,17 @@ function InputStockTags() {
         <ActionIcon.Group mt={26}>
           <Tooltip label="Stocks by type">
             <ActionIcon c="gray.6" variant="default" size={36} aria-label="Gallery">
-              <IconSitemap size={30} />
+              <IconSitemap/>
             </ActionIcon>
           </Tooltip>
           <Tooltip label="Type tip chart">
             <ActionIcon c="gray.6" variant="default" size={36} aria-label="Gallery">
-              <IconList size={30}/>
+              <IconList/>
             </ActionIcon>
           </Tooltip>
           <Tooltip label="Show legend">
             <ActionIcon c="gray.6" variant="default" size={36} aria-label="Gallery">
-              <IconAlignBoxRightBottom size={30}/>
+              <IconAlignBoxRightBottom size={10}/>
             </ActionIcon>
           </Tooltip>
       </ActionIcon.Group>
