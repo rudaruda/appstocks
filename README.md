@@ -15,7 +15,7 @@ Change directory:
 cd frontend
 ```
 
-Add biliotecas:
+Add libs:
 ```
 yarn add @mantine/core @mantine/hooks @mantine/dates dayjs @mantine/charts recharts@2 @mantine/notifications @mantine/code-highlight @mantine/spotlight @tabler/icons-react
 yarn add --dev postcss postcss-preset-mantine postcss-simple-vars
@@ -31,10 +31,18 @@ import { MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
 ```
 
-For finish (output into folder `dist`)
+To finish (output into folder `dist`)
 ```c
 yarn build
 ```
+
+For Publish web on Site: Surge
+Install Surge:
+```
+yarn global add surge
+```
+Into folder `dist` run `surge`
+
 
 Another modes to create new Project:
 Create new app with Vite

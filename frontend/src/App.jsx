@@ -12,6 +12,9 @@ import { IconSun, IconMoon, IconGauge, IconGaugeFilled, IconDashboard, IconChart
   , IconDots, IconPencil, IconTrash
   , IconPhone, IconMapPin, IconAt
   , IconBrandGithub
+  , IconFlame, IconFlameFilled
+  , IconInfoCircle, IconInfoTriangleFilled, IconHelpHexagonFilled, IconInfoSmall
+  , IconSitemap, IconAlignBoxRightBottom, IconList
 } from '@tabler/icons-react';
 
 import { LineChart } from '@mantine/charts';
@@ -57,15 +60,18 @@ import {
   UnstyledButton,
   getContrastColor,
   Anchor, 
-  Modal
+  Modal,
+  PillsInput, Pill, Combobox, CheckIcon, useCombobox
+  , TagsInput
 } from '@mantine/core';
+
+import { Sparkline } from '@mantine/charts';
 
 import cx from 'clsx';
 
 import { debounce } from 'lodash';
 
 import PropTypes from 'prop-types';
-
 
 import classes from './Demo.module.css';
 
@@ -80,6 +86,10 @@ const user = {
   email: 'janspoon@fighter.dev',
   image: 'https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-5.png',
 };
+
+const positiveTrend = [10, 20, 40, 20, 40, 10, 50];
+const negativeTrend = [50, 40, 20, 40, 20, 40, 10];
+const neutralTrend = [10, 20, 40, 20, 40, 10, 50, 5, 10];
 
 function UserMenu(){
   const theme = useMantineTheme();
@@ -186,12 +196,12 @@ function AsideTabs() {
 }
 
 const data_news = [
-  {title:"Noticia 1", content:"Please click anywhere on this card to claim your reward, this is not a fraud, trust us", href:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {title:"Noticia 2", content:"Please click anywhere on this card to claim your reward, this is not a fraud, trust us", href:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {title:"Noticia 3", content:"Please click anywhere on this card to claim your reward, this is not a fraud, trust us", href:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {title:"Noticia 4", content:"Please click anywhere on this card to claim your reward, this is not a fraud, trust us", href:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {title:"Noticia 5", content:"Please click anywhere on this card to claim your reward, this is not a fraud, trust us", href:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
-  {title:"Noticia 6", content:"Please click anywhere on this card to claim your reward, this is not a fraud, trust us", href:"https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
+  {title:"Noticia 1", content:"Please click anywhere on this card to claim your reward, this is not a fraud, trust us", href:"https://www.youtube.com/watch?v=dQw4w9WgXcQ", p:2}, 
+  {title:"Noticia 2", content:"Please click anywhere on this card to claim your reward, this is not a fraud, trust us", href:"https://www.youtube.com/watch?v=dQw4w9WgXcQ", p:1}, 
+  {title:"Noticia 3", content:"Please click anywhere on this card to claim your reward, this is not a fraud, trust us", href:"https://www.youtube.com/watch?v=dQw4w9WgXcQ", p:3},
+  {title:"Noticia 4", content:"Please click anywhere on this card to claim your reward, this is not a fraud, trust us", href:"https://www.youtube.com/watch?v=dQw4w9WgXcQ", p:1},
+  {title:"Noticia 5", content:"Please click anywhere on this card to claim your reward, this is not a fraud, trust us", href:"https://www.youtube.com/watch?v=dQw4w9WgXcQ", p:3},
+  {title:"Noticia 6", content:"Please click anywhere on this card to claim your reward, this is not a fraud, trust us", href:"https://www.youtube.com/watch?v=dQw4w9WgXcQ", p:2},
 ]
 
 function NewsList() {
@@ -199,6 +209,10 @@ function NewsList() {
     <ScrollArea style={{ height: 'calc(100vh - 100px)' }}>
       {data_news.map((news, index) => (
         <Card key={'nws_'+index} shadow="sm" radius="xs" mb="xs" component="a"  href={news.href} target="_blank">
+            <Group style={{ position: 'absolute', top: 13, right: 10, zIndex: 1, gap: '1px'}} >
+            { Array.from({ length: news.p }, (_, ix) => ( <IconFlameFilled size={20} m="xs" key={'nwsp_'+index+'_'+ix}/> ))}
+            { Array.from({ length: 3 - news.p }, (_, ix) => ( <IconFlame size={20} m="xs" key={'nwspd_'+index+'_'+ix}/> ))}
+          </Group>
           <Text size="md" lineClamp={2}>{news.title}</Text>
           <Text size="sm" lineClamp={2}>{news.content}</Text>
           <Text c="dimmed" size="xs" lineClamp={1} style={{ marginTop: 3 }}>{news.href}</Text>
@@ -354,7 +368,7 @@ function ScrollableLineChart() {
     };
   }, []);
   return (
-    <div className="line-chart-container" ref={chartContainerRef} style={{ overflow: 'auto', maxHeight: '400px' }}>
+    <div className="line-chart-container" ref={chartContainerRef}>
       <ChartLine />
     </div>
   );
@@ -760,7 +774,7 @@ function ChipTop1 (){
       <Chip key={'tp1stkc_'+stock.name} icon={<IconCircleFilled style={{ width: rem(8), height: rem(8), color: 'var(--mantine-color-blue-8)' }} />} color="blue" variant="outline" mb={5}>
         <Text size="sm">{stock.name}: {stock.change}%</Text>
       </Chip>
-      <Text c="dimmed" size="sm">{stock.desc}%</Text>
+      <Text c="dimmed" size="sm" mb={7}>{stock.desc}%</Text>
       </Group>
     ))}
     </>
@@ -785,7 +799,7 @@ function ChipTop2 (){
       <Chip key={'tp2stkc_'+stock.name} icon={<IconCircleFilled style={{ width: rem(8), height: rem(8), color: 'var(--mantine-color-red-5)' }} />} color="red" variant="outline" mb={5}>
         <Text size="sm">{stock.name}: {stock.change}%</Text>
       </Chip>
-      <Text c="dimmed" size="sm">{stock.desc}%</Text>
+      <Text c="dimmed" size="sm" mb={7}>{stock.desc}%</Text>
       </Group>
     ))}
     </>
@@ -810,7 +824,7 @@ function ChipTop3 (){
       <Chip key={'to3stkc_'+index} icon={<IconCircleFilled style={{ width: rem(8), height: rem(8), color: 'var(--mantine-color-teal-8)' }} />} color="teal" variant="outline" mb={5}>
         <Text size="sm">{stock.name}: {stock.change}%</Text>
       </Chip>
-      <Text c="dimmed" size="sm">{stock.desc}%</Text>
+      <Text c="dimmed" size="sm" mb={7}>{stock.desc}%</Text>
       </Group>
     ))}
     </>
@@ -825,16 +839,35 @@ function AlertTable() {
     { stock: 'HCTR11', op: '<', value: '3 days', },
     { stock: 'CBCR11', op: '>', value: '5 days', },
   ]
-  const rows = data.map((i, index) => (
+  const rows = data.map((i, index) => {
+    const textVl = String(i.value).replace(/\s.+/, "");
+    let textOp = i.op == '>' ? 'Maior' : i.op == '<' ? 'Menor' : 'Igual';
+    let textQl = String(i.value).includes("avg") ? `que ${textVl} da média de sua carteira` : String(i.value).includes("days") ? `por ${textVl} dias consecutivos` : `que o valor ${textVl}`;
+    const data = [positiveTrend, negativeTrend, neutralTrend][Math.floor(Math.random() * 3)];
+    return (
     <Table.Tr key={`rwAl${index}`}>
+      <Table.Td align="center" p={0}>
+        <Sparkline w={42} h={42} data={data} trendColors={{ positive: 'teal.9', negative: 'orange.8', neutral: 'gray.6' }} fillOpacity={0.5}/>
+      </Table.Td>
       <Table.Td align="center">{i.stock}</Table.Td>
-      <Table.Td align="center"><Kbd>{i.op}</Kbd></Table.Td>
+      <Table.Td align="center" style={{ minWidth: '30px', maxWidth: '50px' }}>
+        <Tooltip label={`${textOp.toLowerCase()}`} position="top" withArrow>
+          <Kbd>{i.op}</Kbd>
+        </Tooltip>
+      </Table.Td>
       <Table.Td align="center">{i.value}</Table.Td>
-      <Table.Td style={{ minWidth: '30px', maxWidth: '40px' }}>
-        <Group gap={0} justify="flex-end"><AlertTableMenu/></Group>
+      <Table.Td style={{ minWidth: '45px', maxWidth: '60px' }}>
+        <Group gap={0} justify="flex-end" direction="row" spacing="xs" >
+        <Tooltip label={`${textOp} ${textQl}`} position="top" withArrow>
+          <ActionIcon color="silver" variant="subtle" >
+            <IconInfoSmall size={30} stroke={2.2}/>
+          </ActionIcon>
+        </Tooltip>
+        <AlertTableMenu/>
+        </Group>
       </Table.Td>
     </Table.Tr>
-  ));
+  )} );
   return (
     <Table highlightOnHover>
       <Table.Tbody>
@@ -973,6 +1006,139 @@ function AboutModal({opened, close}) {
   );
 }
 
+function InputStocks() {
+  const groceries = ['🍎 Apples', '🍌 Bananas', '🥦 Broccoli', '🥕 Carrots', '🍫 Chocolate'];
+
+  const combobox = useCombobox({
+    onDropdownClose: () => combobox.resetSelectedOption(),
+    onDropdownOpen: () => combobox.updateSelectedOptionIndex('active'),
+  });
+
+  const [search, setSearch] = useState('');
+  const [value, setValue] = useState([]);
+  //const [value, setValue] = useState<string[]>([]);
+
+  const [selectedValues, setSelectedValues] = useState([]);
+
+  /*
+  const handleValueSelect = (val: string) =>
+    setValue((current) =>
+      current.includes(val) ? current.filter((v) => v !== val) : [...current, val]
+    );
+  */
+  const handleValueSelect = (val) => {
+      setSelectedValues((current) =>
+        current.includes(val) ? current.filter((v) => v !== val) : [...current, val]
+      );
+    };
+
+  const handleValueRemove = (val) =>
+    setValue((current) => current.filter((v) => v !== val));
+
+  const values = value.map((item) => (
+    <Pill key={item} withRemoveButton onRemove={() => handleValueRemove(item)}>
+      {item}
+    </Pill>
+  ));
+
+  const options = groceries
+    .filter((item) => item.toLowerCase().includes(search.trim().toLowerCase()))
+    .map((item) => (
+      <Combobox.Option value={item} key={item} active={value.includes(item)}>
+        <Group gap="sm">
+          {value.includes(item) ? <CheckIcon size={12} /> : null}
+          <span>{item}</span>
+        </Group>
+      </Combobox.Option>
+    ));
+
+  return (
+    <Combobox store={combobox} onOptionSubmit={handleValueSelect}>
+      <Combobox.DropdownTarget>
+        <PillsInput onClick={() => combobox.openDropdown()}>
+          <Pill.Group>
+            {values}
+
+            <Combobox.EventsTarget>
+              <PillsInput.Field
+                onFocus={() => combobox.openDropdown()}
+                onBlur={() => combobox.closeDropdown()}
+                value={search}
+                placeholder="Search values"
+                onChange={(event) => {
+                  combobox.updateSelectedOptionIndex();
+                  setSearch(event.currentTarget.value);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === 'Backspace' && search.length === 0) {
+                    event.preventDefault();
+                    handleValueRemove(value[value.length - 1]);
+                  }
+                }}
+              />
+            </Combobox.EventsTarget>
+          </Pill.Group>
+        </PillsInput>
+      </Combobox.DropdownTarget>
+
+      <Combobox.Dropdown>
+        <Combobox.Options>
+          {options.length > 0 ? options : <Combobox.Empty>Nothing found...</Combobox.Empty>}
+        </Combobox.Options>
+      </Combobox.Dropdown>
+    </Combobox>
+  );
+}
+
+function InputStockTags() {
+  const allowedTags = ['React', 'Vue', 'Angular', 'JavaScript', 'TypeScript'];
+  const [tags, setTags] = useState([]);
+  const handleChange = (newTags) => {
+    const validTags = newTags.filter(tag => allowedTags.includes(tag)); // filter valid tags
+    setTags(validTags); // update tags with valid
+    //console.log('Tags atualizadas:', newTags, 'Tags válidas:', validTags);
+  };
+  const removeLastTag = () => { setTags((prevTags) => prevTags.slice(0, prevTags.length - 1)); };
+  return (
+    <Grid align="center" gutter="sm" >
+      <Grid.Col span="auto">
+      <TagsInput
+        label="Stocks for graph"
+        //description="Add up to 3 tags"
+        placeholder="Enter tag"
+        clearable
+        maxTags={10}
+        defaultValue={['Vue']}
+        data={allowedTags} // Lista de tags permitidas
+        value={tags}
+        splitChars={[',', '.', '/', '\\', '-', '_', '+', '=', ' ', '|']}
+        onChange={handleChange}
+        size="sm"
+      />
+    </Grid.Col>
+    <Grid.Col span="content">
+        <ActionIcon.Group mt={26}>
+          <Tooltip label="Stocks by type">
+            <ActionIcon c="gray.6" variant="default" size={36} aria-label="Gallery">
+              <IconSitemap size={30} />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Type tip chart">
+            <ActionIcon c="gray.6" variant="default" size={36} aria-label="Gallery">
+              <IconList size={30}/>
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Show legend">
+            <ActionIcon c="gray.6" variant="default" size={36} aria-label="Gallery">
+              <IconAlignBoxRightBottom size={30}/>
+            </ActionIcon>
+          </Tooltip>
+      </ActionIcon.Group>
+    </Grid.Col>
+    </Grid>
+  );
+}
+
 function App() {
   const [count, setCount] = useState(0);
   const [asideOpened, setAsideOpened] = useState(true);
@@ -1008,7 +1174,9 @@ function App() {
           {/* Coluna para o LineChart */}
           <Grid.Col span={12} md={8}>
             <Paper shadow="sm" p="sm">
-              <Title order={6} p="xs">Fechamento por dia</Title>
+              {/*<InputStocks/>*/}
+              <InputStockTags/>
+              <Title order={6} p="xs">Close by day</Title>
               <ScrollableLineChart/>
             </Paper>
           </Grid.Col>
